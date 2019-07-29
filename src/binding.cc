@@ -238,7 +238,7 @@ class Pcap : public Nan::ObjectWrap {
         if (!info[1]->IsUint32())
           return Nan::ThrowTypeError("length must be a positive integer");
 
-        buffer_size = info[1]->Uint32Value();
+        buffer_size = info[1]->Uint32Value(Nan::GetCurrentContext()).FromJust();
       }
 
 #if NODE_MAJOR_VERSION == 0 && NODE_MINOR_VERSION < 10
@@ -288,9 +288,9 @@ class Pcap : public Nan::ObjectWrap {
         return Nan::ThrowTypeError("buffer must be a Buffer");
         
 
-      String::Utf8Value device(info[0]->ToString());
-      String::Utf8Value filter(info[1]->ToString());
-      int buffer_size = info[2]->Int32Value();
+      Nan::Utf8String device(info[0]->ToString(Nan::GetCurrentContext()).ToLocalChecked());
+      Nan::Utf8String filter(info[1]->ToString(Nan::GetCurrentContext()).ToLocalChecked());
+      int buffer_size = info[2]->Int32Value(Nan::GetCurrentContext()).FromJust();
 #if NODE_MAJOR_VERSION == 0 && NODE_MINOR_VERSION < 10
       Local<Object> buffer_obj = info[3]->ToObject();
 #else
@@ -449,7 +449,7 @@ class Pcap : public Nan::ObjectWrap {
       if (obj->pcap_handle == NULL)
         return Nan::ThrowError("Not currently capturing/open");
 
-      if (pcap_setmintocopy(obj->pcap_handle, info[0]->Uint32Value()) != 0)
+      if (pcap_setmintocopy(obj->pcap_handle, info[0]->Uint32Value(Nan::GetCurrentContext()).FromJust()) != 0)
         return Nan::ThrowError("Unable to set min bytes");
 
       return;
@@ -463,7 +463,7 @@ class Pcap : public Nan::ObjectWrap {
       info.GetReturnValue().Set(Nan::New<Boolean>(obj->close()));
     }
 
-    static void Initialize(Handle<Object> target) {
+    static void Initialize(Local<Object> target) {
       Nan::HandleScope scope;
 
       Local<FunctionTemplate> tpl = Nan::New<FunctionTemplate>(New);
@@ -482,7 +482,7 @@ class Pcap : public Nan::ObjectWrap {
       emit_symbol.Reset(Nan::New<String>("emit").ToLocalChecked());
       packet_symbol.Reset(Nan::New<String>("packet").ToLocalChecked());
 
-      target->Set(Nan::New<String>("Cap").ToLocalChecked(), tpl->GetFunction());
+      target->Set(Nan::New<String>("Cap").ToLocalChecked(), tpl->GetFunction(Nan::GetCurrentContext()).ToLocalChecked());
     }
 };
 
@@ -614,13 +614,13 @@ static NAN_METHOD(FindDevice) {
 }
 
 extern "C" {
-  void init(Handle<Object> target) {
+  void init(Local<Object> target) {
     Nan::HandleScope scope;
     Pcap::Initialize(target);
     target->Set(Nan::New<String>("findDevice").ToLocalChecked(),
-                Nan::New<FunctionTemplate>(FindDevice)->GetFunction());
+                Nan::New<FunctionTemplate>(FindDevice)->GetFunction(Nan::GetCurrentContext()).ToLocalChecked());
     target->Set(Nan::New<String>("deviceList").ToLocalChecked(),
-                Nan::New<FunctionTemplate>(ListDevices)->GetFunction());
+                Nan::New<FunctionTemplate>(ListDevices)->GetFunction(Nan::GetCurrentContext()).ToLocalChecked());
   }
 
   NODE_MODULE(cap, init);
