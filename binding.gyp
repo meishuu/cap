@@ -11,7 +11,7 @@
       'conditions': [
         [ 'OS=="win"', {
           'include_dirs': [
-            'deps/winpcap/Include',
+            'deps/npcap-sdk-1.03/Include',
           ],
           'defines': [
             'WPCAP',
@@ -19,11 +19,11 @@
           'conditions': [
             [ 'target_arch=="ia32"', {
               'link_settings': {
-                'libraries': ['ws2_32.lib', '<(PRODUCT_DIR)/../../deps/winpcap/Lib/wpcap.lib'],
+                'libraries': ['ws2_32.lib', '<(PRODUCT_DIR)/../../deps/npcap-sdk-1.03/Lib/wpcap.lib'],
               },
             }, {
               'link_settings': {
-                'libraries': ['ws2_32.lib', '<(PRODUCT_DIR)/../../deps/winpcap/Lib/x64/wpcap.lib'],
+                'libraries': ['ws2_32.lib', '<(PRODUCT_DIR)/../../deps/npcap-sdk-1.03/Lib/x64/wpcap.lib'],
               },
             }],
           ],
